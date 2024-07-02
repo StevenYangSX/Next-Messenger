@@ -2,16 +2,31 @@
 
 import Button from "@/app/components/Button";
 import Input from "@/app/components/input/Input";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import AuthSocialButton from "./AuthSocialButton";
 import { BsGithub, BsGoogle } from "react-icons/bs";
+import axios from "axios";
+
+import { useAlert } from "next-alert";
+import { Alerts } from "next-alert";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Variant = "LOGIN" | "REGISTER";
 
 const AuthForm = () => {
+  const session = useSession();
+  const router = useRouter();
+  const { addAlert } = useAlert();
   const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/users");
+    }
+  }, [session?.status, router]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -38,9 +53,35 @@ const AuthForm = () => {
 
     if (variant === "REGISTER") {
       // register login
+      axios
+        .post("/api/register", data)
+        .then(() => signIn("credentials", data))
+        .catch((error: any) => {
+          console.log(error);
+          addAlert("Error", error.message, "warning");
+        })
+        .finally(() => setIsLoading(false));
     }
     if (variant === "LOGIN") {
       // nextauth signin
+      signIn("credentials", {
+        ...data,
+        redirect: false,
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            addAlert("Error", callback?.error, "error");
+          }
+          if (callback?.ok) {
+            router.push("/users");
+
+            addAlert("Success", "Login Success", "success");
+          }
+        })
+        .catch((error) => {
+          addAlert("Error", error, "warning");
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
@@ -48,10 +89,34 @@ const AuthForm = () => {
     setIsLoading(true);
 
     //nextAuth social signin
+
+    signIn(action, {
+      redirect: false,
+    })
+      .then((callback) => {
+        console.log("git hub login res => ", callback);
+        if (callback?.error) {
+          addAlert("Error", callback?.error, "error");
+        }
+        if (callback?.ok) {
+          router.push("/users");
+          addAlert("Success", "Login Success", "success");
+        }
+      })
+      .catch((error) => {
+        addAlert("Error", error, "warning");
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <Alerts
+        position="top-right"
+        direction="right"
+        timer={3000}
+        className="rounded-md relative z-50 !w-80 text-rose-500"
+      ></Alerts>
       <div className="bg-white px-4 py-8 shadow sm:round-lg sm:px-10">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant === "REGISTER" && (
