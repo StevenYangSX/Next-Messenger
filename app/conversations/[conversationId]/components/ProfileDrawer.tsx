@@ -38,7 +38,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ isOpen, onClose, data }) 
   const statusText = useMemo(() => {
     if (data.isGroup) return `${data.users.length} members`;
     return isActive ? "Active" : "Offline";
-  }, [data]);
+  }, [data, isActive]);
 
   return (
     <>
@@ -119,7 +119,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ isOpen, onClose, data }) 
                                   </dt>
                                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
                                     {data.users.map((user) => (
-                                      <div>{user.email}</div>
+                                      <div key={user.id}>{user.email}</div>
                                     ))}
                                   </dd>
                                 </div>
