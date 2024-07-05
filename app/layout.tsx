@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AlertProvider } from "next-alert";
 import AuthContext from "./context/AutrhContext";
+import ActiveStatus from "./components/ActiveStatus";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthContext>
-          <AlertProvider>{children}</AlertProvider>
+          <AlertProvider>
+            <ActiveStatus />
+            {children}
+          </AlertProvider>
         </AuthContext>
       </body>
     </html>

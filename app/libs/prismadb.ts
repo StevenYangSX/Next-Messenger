@@ -1,15 +1,17 @@
-// import { PrismaClient } from "@prisma/client";
-
-// // declare global {
-// //   var prisma: PrismaClient | undefined;
-// // }
-
-// const client = new PrismaClient();
-
-// // if (process.env.NODE_ENV !== "production") globalThis.prisma = client;
-
-// export default client;
-
 import { PrismaClient } from "@prisma/client";
-const client = new PrismaClient();
-export default client;
+
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
+}
+
+const prisma = globalThis.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalThis.prisma = prisma;
+}
+
+export default prisma;
+// import { PrismaClient } from "@prisma/client";
+// const client = new PrismaClient();
+// export default client;
