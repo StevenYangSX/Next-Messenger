@@ -66,8 +66,8 @@ export async function POST(request: Request) {
 
     const lastMessage = updatedConver.messages.at(-1);
 
-    updatedConver.users.map((user) => {
-      pusherServer.trigger(user.email!, "conversation:update", {
+    updatedConver.users.map(async (user) => {
+      await pusherServer.trigger(user.email!, "conversation:update", {
         id: conversationId,
         message: [lastMessage],
       });

@@ -43,9 +43,9 @@ export async function POST(request: Request) {
         },
       });
 
-      newConver.users.forEach((user) => {
+      newConver.users.forEach(async (user) => {
         if (user.email) {
-          pusherServer.trigger(user.email, "conversation:new", newConver);
+          await pusherServer.trigger(user.email, "conversation:new", newConver);
         }
       });
       return NextResponse.json(newConver);
@@ -92,9 +92,9 @@ export async function POST(request: Request) {
       },
     });
 
-    newConver.users.map((user) => {
+    newConver.users.map(async (user) => {
       if (user.email) {
-        pusherServer.trigger(user.email, "conversation:new", newConver);
+        await pusherServer.trigger(user.email, "conversation:new", newConver);
       }
     });
 

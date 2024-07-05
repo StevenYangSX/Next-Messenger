@@ -36,9 +36,9 @@ export async function DELETE(request: Request, { params }: { params: Iparams }) 
       },
     });
 
-    existingConver.users.forEach((user) => {
+    existingConver.users.forEach(async (user) => {
       if (user.email) {
-        pusherServer.trigger(user.email, "conversation:remove", existingConver);
+        await pusherServer.trigger(user.email, "conversation:remove", existingConver);
       }
     });
 
